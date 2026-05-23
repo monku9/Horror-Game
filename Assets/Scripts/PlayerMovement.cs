@@ -7,17 +7,23 @@ public class PlayerMovement : MonoBehaviour
 
     public float groundDrag;
 
-    [Header("Ground Check")]
-    public float playerHeight;
-    public LayerMask whatIsGround;
-    bool grounded;
+[Header("Sprint")]
+public float sprintMultiplier = 1.5f;
+public KeyCode sprintKey = KeyCode.LeftShift;
 
-    public Transform orientation;
+[Header("Ground Check")]
+public float playerHeight;
+public LayerMask whatIsGround;
+bool grounded;
 
-    float horizontalInput;
-    float verticalInput;
+public Transform orientation;
 
-    Vector3 moveDirection;
+float horizontalInput;
+float verticalInput;
+private bool isSprinting;
+private float currentMoveSpeed;
+
+Vector3 moveDirection;
 
     Rigidbody rb;
 
@@ -32,14 +38,14 @@ public class PlayerMovement : MonoBehaviour
         // ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
-       MyInput();
-       SpeedControl();
+        MyInput();
+        SpeedControl();
 
-       // handle drag
+        // handle drag
         if (grounded)
-        rb.linearDamping = groundDrag;
+            rb.linearDamping = groundDrag;
         else
-        rb.linearDamping = 0;
+            rb.linearDamping = 0;
     }
 
     private void FixedUpdate()
@@ -52,14 +58,18 @@ public class PlayerMovement : MonoBehaviour
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
+
+        bool isMoving = horizontalInput != 0 || verticalInput != 0;
+        isSprinting = (Input.GetKey(sprintKey) || Input.GetKey(KeyCode.RightShift)) && grounded && isMoving;
+        currentMoveSpeed = isSprinting ? moveSpeed * sprintMultiplier : moveSpeed;
     }
 
     private void MovePlayer()
     {
         // calculate movement direction
-        moveDirection = orientation. forward * verticalInput + orientation.right * horizontalInput;
+        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-        rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+        rb.AddForce(moveDirection.normalized * currentMoveSpeed * 10f, ForceMode.Force);
     }
 
     private void SpeedControl()
@@ -67,9 +77,10 @@ public class PlayerMovement : MonoBehaviour
         Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
         // limit velocity if needed
-        if(flatVel.magnitude > moveSpeed)
+        float maxSpeed = currentMoveSpeed;
+        if (flatVel.magnitude > maxSpeed)
         {
-            Vector3 limitedVel = flatVel.normalized * moveSpeed;
+            Vector3 limitedVel = flatVel.normalized * maxSpeed;
             rb.linearVelocity = new Vector3(limitedVel.x, rb.linearVelocity.y, limitedVel.z);
         }
     }

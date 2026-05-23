@@ -3055,6 +3055,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   groundDrag: 5
+  sprintMultiplier: 2
+  sprintKey: 304
   playerHeight: 2
   whatIsGround:
     serializedVersion: 2
