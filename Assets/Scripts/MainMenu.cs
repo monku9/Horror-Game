@@ -1,13 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
+using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private GameObject menuPanel;
-    [SerializeField] private InputField  addressInput;
-    [SerializeField] private Text        statusText;
+    [SerializeField] private TMP_InputField addressInput;
+    [SerializeField] private TextMeshProUGUI  statusText;
 
     private void Start()
     {
